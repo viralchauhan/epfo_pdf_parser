@@ -67,7 +67,7 @@ display_epfo_console("output/parsed_data.json")
 ---
 
 ## Authors
-- Chauhan Viral (update in `setup.py`)
+- Chauhan Viral 
 
 ---
 
