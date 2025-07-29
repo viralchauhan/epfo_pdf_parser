@@ -1,0 +1,4 @@
+# Ignore output directory for generated files
+output/
+PF/
+.vs/

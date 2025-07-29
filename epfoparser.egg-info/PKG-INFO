@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: epfoparser
+Version: 1.0.0
+Summary: EPFO PDF passbook parser and console display tool
+Author: Your Name
+Requires-Python: >=3.7
+Requires-Dist: pdfplumber==0.7.6
+Requires-Dist: tabulate
+Requires-Dist: colorama
+Requires-Dist: reportlab

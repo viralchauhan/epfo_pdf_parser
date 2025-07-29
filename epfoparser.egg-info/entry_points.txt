@@ -1,0 +1,2 @@
+[console_scripts]
+epfoparser = epfo_parser_final:main_entry

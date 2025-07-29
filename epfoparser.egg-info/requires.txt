@@ -1,0 +1,4 @@
+pdfplumber==0.7.6
+tabulate
+colorama
+reportlab
