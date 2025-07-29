@@ -17,6 +17,19 @@ A CLI tool for parsing and displaying Employees' Provident Fund Organization (EP
 
 ---
 
+## Screenshots / Demo
+
+Here are some screenshots demonstrating the tool output and features:
+
+![Screenshot 1](images/1.png)
+![Screenshot 2](images/2.png)
+![Screenshot 3](images/3.png)
+![Screenshot 4](images/4.png)
+![Screenshot 5](images/5.png)
+![Screenshot 6](images/6.png)
+
+---
+
 ## Installation
 
 ```bash
