@@ -20,7 +20,7 @@ A CLI tool for parsing and displaying Employees' Provident Fund Organization (EP
 ## Installation
 
 ```bash
-cd C:\Users\virch\CascadeProjects\epfo_pdf_parser
+cd C:\Users\test\CascadeProjects\epfo_pdf_parser
 pip install -e .
 ```
 This makes the `epfoparser` command available globally in your Python environment.
@@ -67,7 +67,7 @@ display_epfo_console("output/parsed_data.json")
 ---
 
 ## Authors
-- Your Name (update in `setup.py`)
+- Chauhan Viral (update in `setup.py`)
 
 ---
 
