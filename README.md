@@ -72,4 +72,4 @@ display_epfo_console("output/parsed_data.json")
 ---
 
 ## License
-Specify your license here (MIT, Apache, etc.)
+License = MIT
