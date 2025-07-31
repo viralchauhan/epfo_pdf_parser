@@ -22,6 +22,8 @@ def display_epfo_console(json_path):
     print(f"🪪 Member ID:           {mi.get('member_id', '-')}")
     print(f"🎂 Date of Birth:       {mi.get('date_of_birth', '-')}")
     print(f"🧾 UAN:                 {mi.get('uan', '-')}")
+    print(f"✅ Active:              {'✅ Yes' if mi.get('is_active') else '❌ No'}")
+    print(f"🗓️ Last Transaction:    {mi.get('last_transaction_date', '-')}")
     print("=" * 100)
 
     # --- Yearly Summary ---

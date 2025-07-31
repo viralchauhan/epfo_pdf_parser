@@ -1,4 +1,5 @@
-#python new1.py "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\MHBAN01266700000011961"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
+#python epfo_parser_final.py "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\MHBAN01266700000011961"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
+#epfoparser "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\MHBAN01266700000011961"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
 import pdfplumber
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
@@ -262,7 +263,12 @@ class EPFOMultiYearParser:
     
     def consolidate_data(self):
         """Consolidate data from all years."""
-        self.consolidated_data["member_info"] = self.member_info
+        self.consolidated_data["member_info"] = self.member_info.copy()  # Create a copy to modify
+        
+        # Initialize is_active flag as False
+        self.consolidated_data["member_info"]["is_active"] = False
+        self.consolidated_data["member_info"]["last_transaction_date"] = None
+        
         self.consolidated_data["extraction_metadata"]["extracted_at"] = datetime.now().isoformat()
         self.consolidated_data["extraction_metadata"]["total_files_processed"] = len(self.yearly_data)
         self.consolidated_data["extraction_metadata"]["years_covered"] = sorted(self.yearly_data.keys())
@@ -296,6 +302,31 @@ class EPFOMultiYearParser:
             self.consolidated_data["yearly_summaries"].append(summary)
             self.consolidated_data["all_transactions"].extend(year_data["transactions"])
         
+        # Check for active status based on recent transactions
+        if self.consolidated_data["all_transactions"]:
+            # Sort transactions by date
+            all_transactions = sorted(
+                self.consolidated_data["all_transactions"],
+                key=lambda x: datetime.strptime(x["date"], "%d-%m-%Y"),
+                reverse=True
+            )
+            
+            # Get the most recent transaction date
+            latest_transaction = all_transactions[0]
+            latest_date = datetime.strptime(latest_transaction["date"], "%d-%m-%Y")
+            
+            # Calculate the date 3 months ago from today
+            today = datetime.now()
+            three_months_ago = today.replace(day=1)  # First day of current month
+            three_months_ago = (three_months_ago.replace(month=three_months_ago.month - 2) 
+                              if three_months_ago.month > 2 
+                              else three_months_ago.replace(year=three_months_ago.year - 1, 
+                                                         month=three_months_ago.month + 10))
+            
+            # Update member info with active status and last transaction date
+            self.consolidated_data["member_info"]["last_transaction_date"] = latest_transaction["date"]
+            self.consolidated_data["member_info"]["is_active"] = latest_date >= three_months_ago
+            
         # Set final balances (from the latest year)
         if self.consolidated_data["yearly_summaries"]:
             latest_year = self.consolidated_data["yearly_summaries"][-1]

@@ -2,9 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="epfoparser",
-    version="1.0.0",
-    description="EPFO PDF passbook parser and console display tool",
-    author="Your Name",
+    version="1.0.1",
+    description="EPFO PDF passbook parser and console display tool with active member detection",
+    author="Viral Chauhan",
+    license="MIT",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     packages=find_packages(),
     py_modules=["epfo_parser_final", "display_epfo"],
     install_requires=[
