@@ -1,0 +1,11 @@
+name: epfo-env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - pdfplumber
+  - flake8
+  - pytest
