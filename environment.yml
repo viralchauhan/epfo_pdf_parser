@@ -1,11 +1,12 @@
-name: epfo-env
+name: epfoparser
 channels:
   - defaults
   - conda-forge
 dependencies:
   - python=3.10
-  - pandas
-  - numpy
-  - pdfplumber
-  - flake8
-  - pytest
+  - pip
+  - pip:
+      - pdfplumber==0.7.6
+      - tabulate
+      - colorama
+      - reportlab
