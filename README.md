@@ -2,6 +2,10 @@
 
 A CLI tool for parsing and displaying Employees' Provident Fund Organization (EPFO) PDF passbooks. Extracts, consolidates, and displays member and transaction data from multiple years' worth of passbook PDFs, outputting results in JSON and human-readable tabular formats.
 
+## Documentation
+- [User Guide & Features](https://github.com/viralchauhan/epfo_pdf_parser/wiki)
+- [Technical Documentation](https://github.com/viralchauhan/epfo_pdf_parser/wiki/Technical-Documentation)
+
 ---
 
 ## Features
