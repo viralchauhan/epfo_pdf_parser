@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="epfoparser",
-    version="1.0.1",
+    version="1.0.2",
     description="EPFO PDF passbook parser and console display tool with active member detection",
     author="Viral Chauhan",
     license="MIT",
