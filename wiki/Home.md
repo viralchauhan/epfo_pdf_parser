@@ -1,96 +1,209 @@
 # EPFO PDF Parser
 
-A Python-based tool for parsing and analyzing Employee Provident Fund Organisation (EPFO) PDF passbooks. This tool helps in extracting, consolidating, and analyzing EPFO statement data across multiple years.
+A comprehensive Python-based solution for parsing, analyzing, and visualizing Employee Provident Fund Organisation (EPFO) PDF passbooks. This powerful tool enables users to extract, consolidate, and gain valuable insights from their EPF transaction history across multiple years with ease.
 
-## Features
+## 🌟 Key Features
 
-- 📄 Parse EPFO PDF passbooks across multiple years
-- 💰 Extract detailed transaction history
-- 📊 Generate consolidated reports in JSON and Excel formats
-- 🔍 Detect active/inactive member status
-- ✅ Balance continuity validation
-- 📈 Summary statistics and analysis
-- 🖨️ Console-based data display
+### 🔍 Data Extraction
+- Parse multiple EPFO PDF passbooks in one go
+- Extract comprehensive transaction history
+- Retrieve member and establishment details
+- Process multiple years of data simultaneously
 
-## Installation
+### 📊 Analysis & Reporting
+- Generate detailed JSON reports
+- Create human-readable console output
+- Export to multiple formats (JSON, PDF, TXT)
+- Visualize transaction patterns and trends
+
+### 🛠️ Smart Processing
+- Automatic detection of active/inactive status
+- Balance validation across years
+- Transaction categorization
+- Error detection and reporting
+- Support for various EPFO statement formats
+
+## 🚀 Installation
+
+### Prerequisites
+- Python 3.7 or higher
+- pip (Python package manager)
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/viralchauhan/epfo_pdf_parser.git
+   cd epfo_pdf_parser
+   ```
+
+2. **Install the package**
+   ```bash
+   # Install in development mode (recommended)
+   pip install -e .
+   
+   # Or install directly from GitHub
+   # pip install git+https://github.com/viralchauhan/epfo_pdf_parser.git
+   ```
+
+3. **Verify installation**
+   ```bash
+   epfoparser --version
+   ```
+
+## 🛠️ Usage
+
+### Basic Command
 
 ```bash
-# Clone the repository
-git clone https://github.com/viralchauhan/epfo_pdf_parser.git
-
-# Navigate to the project directory
-cd epfo_pdf_parser
-
-# Install the package
-pip install -e .
+epfoparser <input_directory> [output_directory]
 ```
 
-## Usage
+### Command Line Arguments
 
-### Basic Usage
+| Argument | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `input_directory` | Path to directory containing EPFO PDFs | ✅ | - |
+| `output_directory` | Directory to save output files | ❌ | `./output` |
+
+### Example
 
 ```bash
-epfoparser <member_folder_path> [output_directory]
-```
+# Basic usage with default output directory
+epfoparser "./PF/MHBDR002889389/"
 
-Example:
-```bash
-epfoparser ./PF/MHBDR002889389/ ./output/
+# Specify custom output directory
+epfoparser "./PF/MHBDR002889389/" "./reports/"
 ```
 
 ### Input Structure
-Place your EPFO PDF files in a folder structure like:
+
+Organize your EPFO PDFs in this structure:
+
 ```
 PF/
-└── MHBDR002889389/
-    ├── MHBDR002889389_2021.pdf
+└── MHBDR002889389/                 # Member folder (UAN/ID)
+    ├── MHBDR002889389_2021.pdf     # Year-wise statements
     ├── MHBDR002889389_2022.pdf
     └── MHBDR002889389_2023.pdf
 ```
 
 ### Output Files
 
-The tool generates:
-1. JSON file (`*_consolidated.json`) containing:
-   - Member information
-   - Yearly summaries
-   - Transaction details
-   - Active/Inactive status
-   - Final balances
+The tool generates the following output files:
 
-2. Excel report (`*_report.xlsx`) with sheets for:
-   - Member Info
-   - Yearly Summary
-   - All Transactions
-   - Final Balances
+1. **JSON Output** (`consolidated_data.json`)
+   - Complete structured data in JSON format
+   - Includes all transactions, member info, and summaries
+   - Ideal for further processing or analysis
 
-## Key Features Explained
+2. **PDF Report** (`report.pdf`)
+   - Formatted PDF document
+   - Professional layout with tables and summaries
+   - Ready for printing or sharing
 
-### Active Member Detection
-- Members are marked as active if they have transactions within the last 3 months
-- Active status is included in member_info section of the output
-- Last transaction date is tracked for reference
+3. **Text Summary** (`summary.txt`)
+   - Human-readable text summary
+   - Quick overview of key information
+   - Easy to read in any text editor
 
-### Balance Continuity Validation
-- Automatically checks if closing balances match opening balances of subsequent years
-- Validates employee, employer, and pension components separately
-- Reports any mismatches found
+### Viewing Results
 
-### Data Processing
-- Extracts member details (ID, name, DOB, UAN)
-- Processes yearly transactions and balances
-- Calculates contributions, interest, and total balances
-- Maintains chronological transaction history
+The tool automatically displays parsed data in a formatted table. For programmatic access:
 
-## Dependencies
+```python
+from display_epfo import display_epfo_console
 
-- pdfplumber==0.7.6
-- tabulate
-- colorama
-- reportlab
+# Display parsed data in console
+display_epfo_console("output/consolidated_data.json")
+```
 
-## Version History
+## 🔍 Feature Details
 
-- v1.0.2: Added active member detection
-- v1.0.1: Added Excel report generation
-- v1.0.0: Initial release with basic parsing capabilities
+### Member Status Detection
+- **Active/Inactive Status**: Automatically determines if a member is active based on recent transactions
+- **Last Transaction Tracking**: Records the date of the most recent transaction
+- **Contribution Analysis**: Identifies contribution patterns and gaps
+
+### Financial Validation
+- **Balance Continuity**: Ensures closing balances match opening balances of subsequent years
+- **Component-wise Validation**: Validates employee, employer, and pension components separately
+- **Anomaly Detection**: Flags unusual transactions or balance changes
+
+### Data Processing Pipeline
+1. **Extraction**
+   - PDF text extraction with intelligent parsing
+   - Handles various EPFO statement formats
+   - Processes both digital and scanned PDFs (with OCR support)
+
+2. **Transformation**
+   - Standardizes transaction formats
+   - Categorizes transaction types
+   - Converts dates and amounts to consistent formats
+
+3. **Enrichment**
+   - Calculates running balances
+   - Adds metadata and derived fields
+   - Validates data integrity
+
+4. **Output Generation**
+   - Creates structured JSON data
+   - Generates human-readable reports
+   - Formats output for different use cases
+
+## 📦 Dependencies
+
+### Core Dependencies
+- `pdfplumber>=0.7.6` - Advanced PDF text extraction
+- `tabulate>=0.8.9` - Beautiful table formatting
+- `colorama>=0.4.4` - Cross-platform colored output
+- `reportlab>=3.6.8` - PDF report generation
+- `typing-extensions>=4.0.0` - Type hints support
+
+### Development Dependencies
+- `pytest` - Testing framework
+- `black` - Code formatting
+- `mypy` - Static type checking
+- `flake8` - Code linting
+
+### Optional Dependencies
+- `pytesseract` - OCR support for scanned PDFs
+- `pandas` - Advanced data analysis
+
+## 📜 Version History
+
+### v1.1.0 (Upcoming)
+- ✨ Enhanced PDF parsing accuracy
+- 📊 Improved report generation
+- 🐛 Various bug fixes and optimizations
+
+### v1.0.2
+- ✅ Added active member detection
+- 📅 Improved date handling
+- 🛠️ Better error messages
+
+### v1.0.1
+- 📊 Added Excel report generation
+- 📈 Enhanced data validation
+- 🖥️ Improved console output
+
+### v1.0.0
+- 🎉 Initial release
+- 📄 Basic PDF parsing functionality
+- 💾 JSON output support
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- EPFO for providing the passbook service
+- The open-source community for amazing Python libraries
+- All contributors who helped improve this tool
