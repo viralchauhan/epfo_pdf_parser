@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: epfoparser
-Version: 1.0.2
+Version: 1.0.3
 Summary: EPFO PDF passbook parser and console display tool with active member detection
 Author: Viral Chauhan
 License: MIT

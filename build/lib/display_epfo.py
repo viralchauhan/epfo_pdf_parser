@@ -36,7 +36,9 @@ def display_epfo_console(json_path):
         ["🆔 Establishment ID", mi.get('establishment_id', '-')],
         ["🪪 Member ID", mi.get('member_id', '-')],
         ["🎂 Date of Birth", mi.get('date_of_birth', '-')],
-        ["🧾 UAN", mi.get('uan', '-')]
+        ["🧾 UAN", mi.get('uan', '-')],
+        ["✅ Yes", mi.get('is_active', '-')],
+        ["🗓️ Last Transaction", mi.get('last_transaction_date', '-')]
     ]
     print(tabulate(
         member_info_table,

@@ -601,6 +601,9 @@ class EPFOMultiYearParser:
         self.consolidated_data["extraction_metadata"]["years_covered"] = sorted(
             self.yearly_data.keys()
         )
+        # Initialize is_active flag as False
+        self.consolidated_data["member_info"]["is_active"] = False
+        self.consolidated_data["member_info"]["last_transaction_date"] = None
 
         # Initialize total withdrawals tracking
         total_withdrawals = {"employee": 0, "employer": 0, "pension": 0, "total": 0}
@@ -663,6 +666,31 @@ class EPFOMultiYearParser:
 
             self.consolidated_data["yearly_summaries"].append(summary)
             self.consolidated_data["all_transactions"].extend(year_data["transactions"])
+
+        # Check for active status based on recent transactions
+        if self.consolidated_data["all_transactions"]:
+            # Sort transactions by date
+            all_transactions = sorted(
+                self.consolidated_data["all_transactions"],
+                key=lambda x: datetime.strptime(x["date"], "%d-%m-%Y"),
+                reverse=True
+            )
+            
+            # Get the most recent transaction date
+            latest_transaction = all_transactions[0]
+            latest_date = datetime.strptime(latest_transaction["date"], "%d-%m-%Y")
+            
+            # Calculate the date 3 months ago from today
+            today = datetime.now()
+            three_months_ago = today.replace(day=1)  # First day of current month
+            three_months_ago = (three_months_ago.replace(month=three_months_ago.month - 2) 
+                              if three_months_ago.month > 2 
+                              else three_months_ago.replace(year=three_months_ago.year - 1, 
+                                                         month=three_months_ago.month + 10))
+            
+            # Update member info with active status and last transaction date
+            self.consolidated_data["member_info"]["last_transaction_date"] = latest_transaction["date"]
+            self.consolidated_data["member_info"]["is_active"] = latest_date >= three_months_ago
 
         # Set consolidated withdrawal totals
         self.consolidated_data["total_withdrawals"] = total_withdrawals
