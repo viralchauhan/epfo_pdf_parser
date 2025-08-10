@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: epfoparser
-Version: 1.0.1
+Version: 1.0.2
 Summary: EPFO PDF passbook parser and console display tool with active member detection
 Author: Viral Chauhan
 License: MIT
@@ -11,22 +11,43 @@ Requires-Dist: tabulate
 Requires-Dist: colorama
 Requires-Dist: reportlab
 
-# EPFO PDF Passbook Parser & Console Display Tool
+# EPFO PDF Parser & Analysis Tool
 
-A CLI tool for parsing and displaying Employees' Provident Fund Organization (EPFO) PDF passbooks. Extracts, consolidates, and displays member and transaction data from multiple years' worth of passbook PDFs, outputting results in JSON and human-readable tabular formats.
+A powerful Python-based CLI tool for parsing, analyzing, and visualizing EPFO (Employees' Provident Fund Organization) passbook data. This tool helps you extract, consolidate, and analyze your EPF transactions across multiple years with detailed insights and beautiful console output.
+
+## 📚 Documentation
+
+- [📖 User Guide & Features](https://github.com/viralchauhan/epfo_pdf_parser/wiki)
+- [⚙️ Technical Documentation](https://github.com/viralchauhan/epfo_pdf_parser/wiki/Technical-Documentation)
+- [📊 Sample Outputs](https://github.com/viralchauhan/epfo_pdf_parser/tree/main/images)
 
 ---
 
-## Features
-- **Parse multiple EPFO PDF passbooks** and extract:
-  - Member information
-  - Yearly summaries
-  - All transactions (monthly, yearly)
-  - Final balances
-  - Extraction metadata
-- **Consolidate data** from multiple years/files
-- **Display results** in a well-formatted console table
-- **Easy CLI usage** with a single command
+## ✨ Key Features
+
+- **📄 Multi-Year Parsing**
+  - Process multiple EPFO PDF passbooks at once
+  - Automatic detection of transaction years
+  - Consolidate data across multiple years
+
+- **🔍 Comprehensive Data Extraction**
+  - Member information (Name, ID, UAN, DOB)
+  - Establishment details
+  - Detailed transaction history
+  - Yearly summaries and balances
+  - Withdrawal tracking
+
+- **📊 Rich Output**
+  - Beautiful console tables with emoji indicators
+  - JSON export for further analysis
+  - Color-coded output for better readability
+  - Summary statistics and insights
+
+- **⚡ Smart Features**
+  - Automatic balance validation
+  - Transaction categorization
+  - Withdrawal detection and reporting
+  - Error handling and data validation
 
 ---
 
@@ -43,59 +64,149 @@ Here are some screenshots demonstrating the tool output and features:
 
 ---
 
-## Installation
+## 🚀 Installation
 
-```bash
-cd C:\Users\test\CascadeProjects\epfo_pdf_parser
-pip install -e .
-```
-This makes the `epfoparser` command available globally in your Python environment.
+1. **Prerequisites**
+   - Python 3.7 or higher
+   - pip (Python package manager)
+
+2. **Install from source**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/viralchauhan/epfo_pdf_parser.git
+   
+   # Navigate to the project directory
+   cd epfo_pdf_parser
+   
+   # Install in development mode
+   pip install -e .
+   ```
+
+3. **Verify Installation**
+   ```bash
+   epfoparser --version
+   ```
+
+This will make the `epfoparser` command available globally in your Python environment.
 
 ---
 
-## Usage
+## 🛠️ Usage
 
-**Parse EPFO PDFs and generate output:**
+### Basic Usage
+
 ```bash
-epfoparser "C:\Users\test\CascadeProjects\epfo_pdf_parser\PF\MHBAN0XXXXXXXX" "C:\Users\test\CascadeProjects\epfo_pdf_parser\output"
+epfoparser "path/to/your/pdfs" "path/to/output/directory"
 ```
-- The first argument is the directory containing your EPFO PDF files.
-- The second argument is the output directory for the generated JSON and reports.
 
-**Display the parsed data in the console:**
+### Arguments
+
+- **Input Directory**: Path to the directory containing your EPFO PDF files
+  - Files should be named in the format: `MHBAN0XXXXXXXX_YYYY.pdf`
+  - Example: `MHBAN01234560000012345_2021.pdf`
+
+- **Output Directory**: (Optional) Directory to save the output files
+  - Defaults to `./output` if not specified
+
+### Example
+
+```bash
+# Basic usage with default output directory
+epfoparser "~/Documents/EPF/MyPF"
+
+# Specify custom output directory
+epfoparser "~/Documents/EPF/MyPF" "~/Documents/EPF/reports"
+```
+
+### Viewing Results
+
+The tool will automatically display the parsed data in a formatted table. For programmatic access:
+
 ```python
 from display_epfo import display_epfo_console
-display_epfo_console("output/parsed_data.json")
+
+# Display parsed data in console
+display_epfo_console("output/consolidated_data.json")
+```
+
+### Output Files
+
+- `consolidated_data.json`: Complete JSON data
+- `report.pdf`: Formatted PDF report
+- `summary.txt`: Text summary
+
+---
+
+## 📁 Project Structure
+
+```
+epfo_pdf_parser/
+├── epfo_parser_final.py   # Main parser implementation
+├── display_epfo.py       # Console display utilities
+├── setup.py              # Package configuration
+├── requirements.txt      # Dependencies
+├── README.md             # This file
+├── wiki/                 # Documentation
+│   ├── Home.md
+│   └── Technical-Documentation.md
+├── PF/                   # Sample input directory
+│   └── MHBAN0XXXXXXXX/   # Member folder
+│       ├── MHBAN0XXXXXXXX_2021.pdf
+│       └── MHBAN0XXXXXXXX_2022.pdf
+└── output/               # Generated output files
+    ├── consolidated_data.json
+    ├── report.pdf
+    └── summary.txt
 ```
 
 ---
 
-## File Structure
-- `epfo_parser_final.py`: Main parser and CLI entry point
-- `display_epfo.py`: Console display utility
-- `setup.py`: Packaging and installation
-- `PF/`: Directory containing sample/input PDF files
-- `output/`: Directory for parsed JSON and reports
-- `readme.txt`: This file
+## ⚙️ Requirements
 
----
-
-## Requirements
 - Python 3.7+
-- Packages: `pdfplumber`, `tabulate`, `colorama`, `reportlab`
+- Required packages (automatically installed):
+  - `pdfplumber>=0.7.6` - PDF text extraction
+  - `tabulate>=0.8.9` - Pretty-printed tables
+  - `colorama>=0.4.4` - Cross-platform colored terminal text
+  - `reportlab>=3.6.8` - PDF report generation
+  - `typing-extensions>=4.0.0` - Type hints support
 
 ---
 
-## Extending
-- Add more PDF files to the `PF` directory and rerun the parser
-- Customize `display_epfo.py` for different output formats or analytics
+## 🚀 Extending
 
----
+### Adding More PDFs
+1. Place your PDFs in the `PF` directory
+2. Ensure filenames follow the pattern: `MHBAN0XXXXXXXX_YYYY.pdf`
+3. Run the parser again
 
-## Authors
-- Chauhan Viral 
+### Customization
+- Modify `display_epfo.py` for custom output formats
+- Extend `EPFOMultiYearParser` class for additional features
+- Create custom reports using the JSON output
 
----
+## 🤝 Contributing
 
-## License
-License = MIT
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+**Chauhan Viral**
+- GitHub: [@viralchauhan](https://github.com/viralchauhan)
+- Email: [your.email@example.com](mailto:your.email@example.com)
+
+## 🙏 Acknowledgments
+
+- EPFO for providing the passbook service
+- Open source community for amazing Python libraries
+- All contributors who helped improve this tool
