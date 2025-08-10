@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from pathlib import Path
 
 setup(
     name="epfoparser",
@@ -6,7 +7,7 @@ setup(
     description="EPFO PDF passbook parser and console display tool with active member detection",
     author="Viral Chauhan",
     license="MIT",
-    long_description=open("README.md").read(),
+    long_description=Path("README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     packages=find_packages(),
     py_modules=["epfo_parser_final", "display_epfo"],
