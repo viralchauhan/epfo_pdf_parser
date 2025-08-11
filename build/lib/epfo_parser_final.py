@@ -125,6 +125,7 @@ class EPFOMultiYearParser:
             "closing_balance": {"employee": 0, "employer": 0, "pension": 0},
             "contributions": {"employee": 0, "employer": 0, "pension": 0},
             "withdrawals": {"employee": 0, "employer": 0, "pension": 0},
+            "transfer_ins": {"employee": 0, "employer": 0, "pension": 0},
             "interest": {"employee": 0, "employer": 0, "pension": 0},
         }
 
@@ -196,6 +197,22 @@ class EPFOMultiYearParser:
             balances["withdrawals"]["pension"] = self.parse_amount(
                 withdrawal_match.group(3)
             )
+        
+        # --- Total Transfer-Ins/VDRs ---
+        transfer_match = re.search(
+        r"Total Transfer-Ins/VDRs for the year.*?(\d{1,3}(?:,\d{3})*|\d+)\s+(\d{1,3}(?:,\d{3})*|\d+)\s+(\d{1,3}(?:,\d{3})*|\d+)",
+        text, re.DOTALL
+        )
+        if transfer_match:
+            balances["transfer_ins"]["employee"] = self.parse_amount(
+                transfer_match.group(1)
+            )
+            balances["transfer_ins"]["employer"] = self.parse_amount(
+                transfer_match.group(2)
+            )
+            balances["transfer_ins"]["pension"] = self.parse_amount(
+                transfer_match.group(3)
+            )
 
         # FIXED: Extract Interest - Handle multiple patterns
         interest_found = False
@@ -216,7 +233,7 @@ class EPFOMultiYearParser:
         # Pattern 2: "Int. given against Claim" format (NEW)
         if not interest_found:
             claim_int_match = re.search(
-                r"Int\.\s+given\s+against\s+Claim\s*:\s*[A-Z0-9]+\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+                r"Int\.\s+given\s+against\s+Claim(?:\s*:\s*[A-Z0-9]+)?\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
                 text,
                 re.DOTALL | re.IGNORECASE,
             )
@@ -719,6 +736,10 @@ class EPFOMultiYearParser:
                 "contributions_employer": balances["contributions"]["employer"],
                 "contributions_pension": balances["contributions"]["pension"],
                 "contributions_total": sum(balances["contributions"].values()),
+                "transfer_ins_employee": balances["transfer_ins"]["employee"],
+                "transfer_ins_employer": balances["transfer_ins"]["employer"],
+                "transfer_ins_pension": balances["transfer_ins"]["pension"],
+                "transfer_ins_total": sum(balances["transfer_ins"].values()),
                 "withdrawals_employee": year_withdrawals["employee"],
                 "withdrawals_employer": year_withdrawals["employer"],
                 "withdrawals_pension": year_withdrawals["pension"],

@@ -233,7 +233,7 @@ class EPFOMultiYearParser:
         # Pattern 2: "Int. given against Claim" format (NEW)
         if not interest_found:
             claim_int_match = re.search(
-                r"Int\.\s+given\s+against\s+Claim\s*:\s*[A-Z0-9]+\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+                r"Int\.\s+given\s+against\s+Claim(?:\s*:\s*[A-Z0-9]+)?\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
                 text,
                 re.DOTALL | re.IGNORECASE,
             )
