@@ -3,7 +3,7 @@ from pathlib import Path
 
 setup(
     name="epfoparser",
-    version="1.0.6",
+    version="1.0.8",
     description="EPFO PDF passbook parser and console display tool with active member detection",
     author="Viral Chauhan",
     license="MIT",

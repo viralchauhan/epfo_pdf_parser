@@ -217,32 +217,50 @@ class EPFOMultiYearParser:
         # FIXED: Extract Interest - Handle multiple patterns
         interest_found = False
     
-        # Pattern 1: Standard "Int. Updated upto" format (exclude OB lines)
-        int_match = re.search(
-            r"(?<!OB\s)Int\. Updated upto\s+\d{2}/\d{2}/\d{4}\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+        # Pattern 1: "Int. given against Claim" format (HIGHEST PRIORITY - most specific)
+        claim_int_match = re.search(
+            r"Int\.\s*given\s*against\s*Claim\s*:?\s*(?:\S+\s+)?"
+            r"(\d{1,3}(?:,\d{3})*|\d+)\s+"
+            r"(\d{1,3}(?:,\d{3})*|\d+)\s+"
+            r"(\d{1,3}(?:,\d{3})*|\d+)",
             text,
             re.DOTALL | re.IGNORECASE,
         )
-        if int_match:
-            balances["interest"]["employee"] = self.parse_amount(int_match.group(1))
-            balances["interest"]["employer"] = self.parse_amount(int_match.group(2))
-            balances["interest"]["pension"] = self.parse_amount(int_match.group(3))
+        if claim_int_match:
+            balances["interest"]["employee"] = self.parse_amount(claim_int_match.group(1))
+            balances["interest"]["employer"] = self.parse_amount(claim_int_match.group(2))
+            balances["interest"]["pension"] = self.parse_amount(claim_int_match.group(3))
             interest_found = True
-            #print(f"DEBUG: Found standard interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+            #print(f"DEBUG: Found claim interest pattern (PRIORITY) - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
 
-        # Pattern 2: "Int. given against Claim" format (NEW)
+        # Pattern 2: Standard "Int. Updated upto" format (exclude OB lines) - LOWER PRIORITY
         if not interest_found:
-            claim_int_match = re.search(
-                r"Int\.\s+given\s+against\s+Claim(?:\s*:\s*[A-Z0-9]+)?\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+            # More specific pattern to avoid taxable data section
+            int_match = re.search(
+                r"(?<!OB\s)Int\. Updated upto\s+\d{2}/\d{2}/\d{4}\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)(?=\s*Closing Balance)",
                 text,
                 re.DOTALL | re.IGNORECASE,
             )
-            if claim_int_match:
-                balances["interest"]["employee"] = self.parse_amount(claim_int_match.group(1))
-                balances["interest"]["employer"] = self.parse_amount(claim_int_match.group(2))
-                balances["interest"]["pension"] = self.parse_amount(claim_int_match.group(3))
+            if int_match:
+                balances["interest"]["employee"] = self.parse_amount(int_match.group(1))
+                balances["interest"]["employer"] = self.parse_amount(int_match.group(2))
+                balances["interest"]["pension"] = self.parse_amount(int_match.group(3))
                 interest_found = True
-                #print(f"DEBUG: Found claim interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+                #print(f"DEBUG: Found standard interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+
+            # Fallback for standard pattern without "Closing Balance" lookahead
+            if not interest_found:
+                int_match_fallback = re.search(
+                    r"(?<!OB\s)(?<!Taxable Data)Int\. Updated upto\s+\d{2}/\d{2}/\d{4}\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+                    text,
+                    re.DOTALL | re.IGNORECASE,
+                )
+                if int_match_fallback:
+                    balances["interest"]["employee"] = self.parse_amount(int_match_fallback.group(1))
+                    balances["interest"]["employer"] = self.parse_amount(int_match_fallback.group(2))
+                    balances["interest"]["pension"] = self.parse_amount(int_match_fallback.group(3))
+                    interest_found = True
+                    #print(f"DEBUG: Found standard interest pattern (fallback) - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
 
         # Pattern 3: Generic interest pattern (fallback)
         if not interest_found:
