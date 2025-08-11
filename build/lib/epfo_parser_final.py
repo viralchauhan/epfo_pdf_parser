@@ -1,4 +1,4 @@
-#python epfo_parser_final.py "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\MHBAN01266700000011961"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
+#python epfo_parser_final.py "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\GJAHD14545890000000015"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
 #epfoparser "C:\Users\virch\CascadeProjects\epfo_pdf_parser\PF\MHBAN01266700000011961"  "C:\Users\virch\CascadeProjects\epfo_pdf_parser\output"
 import pdfplumber
 from reportlab.lib.pagesizes import letter, A4
@@ -197,16 +197,86 @@ class EPFOMultiYearParser:
                 withdrawal_match.group(3)
             )
 
-        # Extract Interest
+        # FIXED: Extract Interest - Handle multiple patterns
+        interest_found = False
+    
+        # Pattern 1: Standard "Int. Updated upto" format (exclude OB lines)
         int_match = re.search(
             r"(?<!OB\s)Int\. Updated upto\s+\d{2}/\d{2}/\d{4}\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
             text,
-            re.DOTALL,
+            re.DOTALL | re.IGNORECASE,
         )
         if int_match:
             balances["interest"]["employee"] = self.parse_amount(int_match.group(1))
             balances["interest"]["employer"] = self.parse_amount(int_match.group(2))
             balances["interest"]["pension"] = self.parse_amount(int_match.group(3))
+            interest_found = True
+            #print(f"DEBUG: Found standard interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+
+        # Pattern 2: "Int. given against Claim" format (NEW)
+        if not interest_found:
+            claim_int_match = re.search(
+                r"Int\.\s+given\s+against\s+Claim\s*:\s*[A-Z0-9]+\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)",
+                text,
+                re.DOTALL | re.IGNORECASE,
+            )
+            if claim_int_match:
+                balances["interest"]["employee"] = self.parse_amount(claim_int_match.group(1))
+                balances["interest"]["employer"] = self.parse_amount(claim_int_match.group(2))
+                balances["interest"]["pension"] = self.parse_amount(claim_int_match.group(3))
+                interest_found = True
+                #print(f"DEBUG: Found claim interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+
+        # Pattern 3: Generic interest pattern (fallback)
+        if not interest_found:
+            generic_int_match = re.search(
+                r"(?:Int\.|Interest)(?:.*?)(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)",
+                text,
+                re.DOTALL | re.IGNORECASE,
+            )
+            if generic_int_match:
+                # Only use this if the amounts seem reasonable (not too large)
+                emp_int = self.parse_amount(generic_int_match.group(1))
+                empr_int = self.parse_amount(generic_int_match.group(2))
+                pen_int = self.parse_amount(generic_int_match.group(3))
+            
+                # Sanity check - interest shouldn't be larger than contributions typically
+                total_contrib = sum(balances["contributions"].values())
+                total_int = emp_int + empr_int + pen_int
+            
+                if total_contrib == 0 or total_int <= total_contrib * 0.5:  # Interest shouldn't be more than 50% of contributions
+                    balances["interest"]["employee"] = emp_int
+                    balances["interest"]["employer"] = empr_int
+                    balances["interest"]["pension"] = pen_int
+                    interest_found = True
+                    #print(f"DEBUG: Found generic interest pattern - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+
+        # Pattern 4: Look for interest in individual transaction lines (last resort)
+        if not interest_found:
+            # Search for any line that mentions interest with amounts
+            int_transaction_matches = re.findall(
+                r"(?:Interest|Int\.).*?(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)",
+                text,
+                re.IGNORECASE | re.DOTALL
+            )
+        
+            if int_transaction_matches:
+                # Take the last match (usually the summary)
+                last_match = int_transaction_matches[-1]
+                balances["interest"]["employee"] = self.parse_amount(last_match[0])
+                balances["interest"]["employer"] = self.parse_amount(last_match[1])
+                balances["interest"]["pension"] = self.parse_amount(last_match[2])
+                #print(f"DEBUG: Found interest from transaction lines - Employee: {balances['interest']['employee']}, Employer: {balances['interest']['employer']}, Pension: {balances['interest']['pension']}")
+
+        # Debug output if no interest found
+        if not interest_found and sum(balances["interest"].values()) == 0:
+            #print(f"DEBUG: No interest patterns matched for year {year}")
+            # Print relevant lines for debugging
+            lines = text.split('\n')
+            interest_lines = [line for line in lines if 'int' in line.lower() and any(c.isdigit() for c in line)]
+            #print(f"DEBUG: Lines containing 'int' and numbers:")
+            for line in interest_lines[:5]:  # Show first 5 matches
+                print(f"  {line.strip()}")
 
         return balances
 
