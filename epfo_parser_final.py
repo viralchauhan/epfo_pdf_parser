@@ -785,6 +785,11 @@ class EPFOMultiYearParser:
                 reverse=True
             )
             
+            contribution_txns = [
+                t for t in self.consolidated_data["all_transactions"]
+                if t.get("description") == "Cont. For Due-Month"
+            ]
+
             # Get the most recent transaction date
             latest_transaction = all_transactions[0]
             latest_date = datetime.strptime(latest_transaction["date"], "%d-%m-%Y")
@@ -798,8 +803,18 @@ class EPFOMultiYearParser:
                                                          month=three_months_ago.month + 10))
             
             # Update member info with active status and last transaction date
-            self.consolidated_data["member_info"]["last_transaction_date"] = latest_transaction["date"]
-            self.consolidated_data["member_info"]["is_active"] = latest_date >= three_months_ago
+            if contribution_txns:
+                contribution_txns = sorted(
+                    contribution_txns,
+                    key=lambda x: datetime.strptime(x["date"], "%d-%m-%Y"),
+                    reverse=True
+                )
+                latest_contribution = contribution_txns[0]
+                latest_date = datetime.strptime(latest_contribution["date"], "%d-%m-%Y")
+
+                self.consolidated_data["member_info"]["last_transaction_date"] = latest_contribution["date"]
+                self.consolidated_data["member_info"]["is_active"] = latest_date >= three_months_ago
+
 
         # Set consolidated withdrawal totals
         self.consolidated_data["total_withdrawals"] = total_withdrawals
